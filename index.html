@@ -1,306 +1,154 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Video Player</title>
-<meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy"
-      content="default-src 'self' https:;
-               script-src 'self' https: 'unsafe-inline';
-               style-src 'self' 'unsafe-inline';
-               img-src 'self' data: https:;
-               media-src https:;
-               frame-src https:;
-               connect-src 'self' https:;">
+<meta charset="UTF-8">
+<title>Video</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-:root{
-  --bg:#000;
-  --border:#e5e7eb;
-  --fg:#f2f2f2;
-  --muted:#bdbdbd;
-  --shadow:0 18px 50px rgba(0,0,0,.55);
-}
-*{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-body{margin:0;background:#fff}
-.wrap{max-width:900px;margin:0 auto;padding:12px}
-.player-shell{
+html,body{margin:0;padding:0;background:#000;height:100%}
+body{display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.wrapper{width:min(900px,100%);padding:16px}
+.player{
   position:relative;
   width:100%;
   aspect-ratio:16/9;
   background:#000;
-  border:1px solid var(--border);
+  border-radius:16px;
   overflow:hidden;
-  box-shadow:var(--shadow);
 }
-.player-shell video,
-.player-shell iframe{
-  position:absolute;inset:0;width:100%;height:100%;
-  background:#000;border:0;
-}
-.player-shell video{object-fit:contain;display:none}
-.player-shell iframe{display:none}
-/* Poster blur layer (anti-spam style) */
+.player.vertical{aspect-ratio:9/16}
 .poster{
-  position:absolute;inset:-20px;
-  background:#000 center/cover no-repeat;
-  filter: blur(14px) brightness(.72);
-  transform: scale(1.12);
-  opacity:1;
-  transition: opacity .25s ease;
+  position:absolute;inset:0;
+  background:center/cover no-repeat;
+  opacity:.9;
 }
 .poster::after{
   content:"";
   position:absolute;inset:0;
-  background:linear-gradient(to bottom, rgba(0,0,0,.15), rgba(0,0,0,.65));
+  background:linear-gradient(to bottom, rgba(0,0,0,.2), rgba(0,0,0,.7));
 }
-/* Click overlay */
+iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:none}
 .overlay{
   position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
-  padding:16px;text-align:center;
 }
 .card{
-  width:min(560px, 92%);
-  background: rgba(10,10,10,.58);
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:16px;
-  backdrop-filter: blur(10px);
-  padding:18px 16px;
+  background:rgba(0,0,0,.55);
+  backdrop-filter: blur(6px);
+  border-radius:14px;
+  padding:20px 22px;
+  text-align:center;
+  color:#fff;
 }
-.title{margin:0 0 10px 0;font-size:18px;line-height:1.25;font-weight:800;color:var(--fg)}
-.sub{margin:0 0 14px 0;font-size:13px;line-height:1.3;color:var(--muted)}
-.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.card h1{margin:0 0 8px 0;font-size:20px}
+.card p{margin:0 0 14px 0;font-size:13px;opacity:.85}
+.actions{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+}
 .btn{
-  padding:10px 14px;border:0;border-radius:999px;
-  background:#111827;color:#fff;font-weight:800;cursor:pointer;
+  padding:10px 18px;
+  border-radius:999px;
+  border:0;
+  cursor:pointer;
+  font-weight:700;
 }
-.btn.primary{background:#2563eb}
-.btn:active{transform:translateY(1px)}
-.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-.btn2{padding:10px 14px;border:0;border-radius:6px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer}
-.btn2.ghost{background:#111827}
-@media(max-width:640px){.player-shell{aspect-ratio:9/16}}
+.btn.play{background:#3b82f6;color:#fff}
+.btn.download{background:#111827;color:#fff}
+.share{
+  margin-top:14px;
+  display:flex;
+  gap:14px;
+  justify-content:center;
+  color:#ddd;
+  font-size:13px;
+}
+.share span{cursor:pointer;opacity:.9}
+.share span:hover{opacity:1}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div id="shell" class="player-shell">
+<div class="wrapper">
+  <div id="player" class="player">
     <div id="poster" class="poster"></div>
 
-    <video id="player" controls playsinline preload="metadata"></video>
-    <iframe id="dm" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+    <iframe id="dm" allow="autoplay;fullscreen" allowfullscreen></iframe>
 
     <div id="overlay" class="overlay">
       <div class="card">
-        <h1 id="t" class="title">Loading…</h1>
-        <p class="sub">Tap Play to start. “Download” opens the same safe link.</p>
+        <h1>Video</h1>
+        <p>Tap Play to start. “Download” opens the same safe link.</p>
         <div class="actions">
-          <button class="btn primary" id="playBtn">Play</button>
-          <button class="btn" id="dlBtn2">Download</button>
+          <button id="playBtn" class="btn play">Play</button>
+          <button id="dlBtn" class="btn download">Download</button>
+        </div>
+        <div class="share">
+          <span id="copyBtn">Copy link</span>
+          <span id="shareFb">Facebook</span>
+          <span id="shareWa">WhatsApp</span>
+          <span id="shareTg">Telegram</span>
         </div>
       </div>
     </div>
   </div>
-
-  <div class="controls">
-    <button class="btn2 ghost" id="copyBtn">Copy Link</button>
-    <button class="btn2" id="dlBtn">Download</button>
-  </div>
 </div>
 
-<!-- Histats -->
 <script>
-var _Hasync=_Hasync||[];
-_Hasync.push(['Histats.start','1,4654540,4,0,0,0,00010000']);
-_Hasync.push(['Histats.fasi','1']);
-_Hasync.push(['Histats.track_hits','']);
-(function(){var hs=document.createElement('script');hs.async=true;hs.src='//s10.histats.com/js15_as.js';document.body.appendChild(hs);})();
-</script>
+const SMARTLINK = "https://harbourbreederdump.com/an29v43y4m?key=549781a632ef3b8389ad01c914a1ee3a"; // ganti
+const q = new URLSearchParams(location.search);
+const dm = q.get("dm");
+const ar = q.get("ar");
+const player = document.getElementById("player");
+const poster = document.getElementById("poster");
+const frame = document.getElementById("dm");
+const overlay = document.getElementById("overlay");
 
-<script>
-(function(){
-  const q=new URLSearchParams(location.search);
-  const v=document.getElementById('player');
-  const f=document.getElementById('dm');
-  const overlay=document.getElementById('overlay');
-  const poster=document.getElementById('poster');
-  const titleEl=document.getElementById('t');
+if(ar==="9x16") player.classList.add("vertical");
 
-  // Existing config (taken from your uploaded template)
-  const SMARTLINK='https://harbourbreederdump.com/an29v43y4m?key=549781a632ef3b8389ad01c914a1ee3a';
+function extractId(v){
+  if(!v) return "";
+  if(/^[a-zA-Z0-9]+$/.test(v)) return v;
+  try{
+    const u=new URL(v);
+    if(u.hostname.includes("dai.ly")) return u.pathname.slice(1);
+    const m=u.pathname.match(/\/video\/([^_/?#]+)/);
+    return m?m[1]:"";
+  }catch(e){return "";}
+}
 
-  // Adsterra (from your uploaded template)
-  const NATIVE_INVOKE='https://harbourbreederdump.com/54f40a4ce292a9187e0b9a0feb507f92/invoke.js';
-  const NATIVE_CONTAINER_ID='container-54f40a4ce292a9187e0b9a0feb507f92';
-  const POPUNDER_SRC='https://harbourbreederdump.com/2e/a1/21/2ea12153a74996b501c2507cb4eebc96.js';
+const id = extractId(dm);
 
-  // --- Source detection ---
-  // Dailymotion: ?dm=VIDEO_ID  OR ?url=https://www.dailymotion.com/video/ID  OR ?url=https://dai.ly/ID
-  const dmParam=(q.get('dm')||q.get('dailymotion')||q.get('dm_id')||'').trim();
-  const urlParam=(q.get('url')||'').trim();
+async function loadMeta(){
+  if(!id) return;
+  const o = await fetch("https://www.dailymotion.com/services/oembed?format=json&url=https://www.dailymotion.com/video/"+id);
+  if(!o.ok) return;
+  const j = await o.json();
+  poster.style.backgroundImage = `url(${j.thumbnail_url})`;
+}
 
-  // MP4: ?src=https://...
-  let src=(q.get('src')||'').trim();
+function openSmart(){
+  if(!SMARTLINK.includes("example")) window.open(SMARTLINK,"_blank","noopener");
+}
 
-  // Videy: ?id=xxxx
-  const id=(q.get('id')||'').trim();
+document.getElementById("playBtn").onclick=()=>{
+  openSmart();
+  frame.src="https://www.dailymotion.com/embed/video/"+id+"?autoplay=1";
+  frame.style.display="block";
+  overlay.style.display="none";
+};
 
-  function extractDmId(input){
-    if(!input) return '';
-    // if already looks like an ID
-    if(/^[a-zA-Z0-9]+$/.test(input) && input.length>=6) return input;
-    try{
-      const u=new URL(input);
-      if(u.hostname.includes('dai.ly')){
-        return u.pathname.replace('/','').split(/[?#]/)[0];
-      }
-      const m=u.pathname.match(/\/video\/([^_/?#]+)/i);
-      return (m&&m[1])?m[1]:'';
-    }catch(e){return '';}
-  }
+document.getElementById("dlBtn").onclick=openSmart;
 
-  const dmId = extractDmId(dmParam) || extractDmId(urlParam);
+document.getElementById("copyBtn").onclick=()=>{
+  navigator.clipboard.writeText(location.href).catch(()=>{});
+};
 
-  function setTitle(t){ titleEl.textContent=t||'Video'; }
-  function setPoster(url){ if(url) poster.style.backgroundImage=`url("${url}")`; }
+document.getElementById("shareFb").onclick=()=>window.open("https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(location.href));
+document.getElementById("shareWa").onclick=()=>window.open("https://wa.me/?text="+encodeURIComponent(location.href));
+document.getElementById("shareTg").onclick=()=>window.open("https://t.me/share/url?url="+encodeURIComponent(location.href));
 
-  async function loadDmOembed(id){
-    try{
-      const pageUrl='https://www.dailymotion.com/video/'+id;
-      const oembed='https://www.dailymotion.com/services/oembed?format=json&url='+encodeURIComponent(pageUrl);
-      const r=await fetch(oembed,{cache:'force-cache'});
-      if(!r.ok) return null;
-      return await r.json();
-    }catch(e){return null;}
-  }
-
-  // Prepare player shell ratio
-  function setAspectByMeta(w,h){
-    const shell=document.getElementById('shell');
-    if(w && h && w>h) shell.style.aspectRatio='16/9';
-    else if(w && h) shell.style.aspectRatio='9/16';
-  }
-
-  // Smartlink open on click
-  function openSmartlink(){
-    if(!SMARTLINK) return;
-    // open in new tab so the player still continues
-    window.open(SMARTLINK,'_blank','noopener,noreferrer');
-  }
-
-  // Start playback only after user click
-  function startPlayback(){
-    openSmartlink();
-
-    if(dmId){
-      // Dailymotion
-      v.style.display='none';
-      f.style.display='block';
-      f.src='https://www.dailymotion.com/embed/video/'+dmId+'?autoplay=1';
-      overlay.style.display='none';
-      poster.style.opacity='0';
-      return;
-    }
-
-    // MP4 mode
-    if(src){
-      src=decodeURIComponent(src);
-      if(src.startsWith('http://')) src='https://'+src.slice(7);
-      f.style.display='none';
-      v.style.display='block';
-      v.src=src;
-      v.load();
-      v.play().catch(()=>{});
-      overlay.style.display='none';
-      poster.style.opacity='0';
-      return;
-    }
-
-    // Videy mode
-    if(id){
-      const e=encodeURIComponent(id);
-      const cands=[
-        'https://cdn.videy.co/'+e+'.mp4',
-        'https://cdn.videy.co/'+e+'.m4v',
-        'https://cdn-videys.com/'+e+'.mp4',
-        'https://cdn-videys.com/'+e+'.m4v'
-      ];
-      let i=0;
-      const next=()=>{
-        if(i>=cands.length) return;
-        f.style.display='none';
-        v.style.display='block';
-        v.src=cands[i++]+'?t='+(Date.now());
-        v.load();
-      };
-      next();
-      v.addEventListener('error',next,{once:false});
-      v.play().catch(()=>{});
-      overlay.style.display='none';
-      poster.style.opacity='0';
-      return;
-    }
-
-    setTitle('Provide ?dm=VIDEO_ID or ?src=MP4 or ?id=VIDEY');
-  }
-
-  document.getElementById('playBtn').onclick=startPlayback;
-  document.getElementById('dlBtn2').onclick=()=>openSmartlink();
-
-  // Keep original controls behavior
-  document.getElementById('copyBtn').onclick=async()=>{
-    try{await navigator.clipboard.writeText(location.href);}
-    catch{prompt('Copy:',location.href);}
-  };
-  document.getElementById('dlBtn').onclick=()=>location.href=SMARTLINK;
-
-  // Auto aspect ratio for MP4/Videy after metadata
-  v.addEventListener('loadedmetadata',()=>{
-    setAspectByMeta(v.videoWidth, v.videoHeight);
-  });
-
-  // Initial title/poster setup (best effort)
-  (async()=>{
-    if(dmId){
-      setTitle('Video');
-      const data=await loadDmOembed(dmId);
-      if(data){
-        setTitle(data.title||'Video');
-        setPoster(data.thumbnail_url||'');
-      }
-      // If vertical query param
-      const ar=(q.get('ar')||'').toLowerCase();
-      if(ar==='9x16'||ar==='9:16'||ar==='vertical') document.getElementById('shell').style.aspectRatio='9/16';
-      if(ar==='16x9'||ar==='16:9'||ar==='landscape') document.getElementById('shell').style.aspectRatio='16/9';
-      return;
-    }
-    if(src) setTitle('Video');
-    else if(id) setTitle('Video');
-    else setTitle('Provide ?dm=VIDEO_ID');
-  })();
-
-  // Delay ads (popunder + native) from your template
-  window.addEventListener('load',()=>{
-    setTimeout(()=>{
-      if(NATIVE_INVOKE && NATIVE_CONTAINER_ID){
-        const s1=document.createElement('script');
-        s1.async=true;s1.setAttribute('data-cfasync','false');
-        s1.src=NATIVE_INVOKE;
-        document.body.appendChild(s1);
-
-        const c=document.createElement('div');
-        c.id=NATIVE_CONTAINER_ID;
-        document.body.appendChild(c);
-      }
-      if(POPUNDER_SRC){
-        const s2=document.createElement('script');
-        s2.src=POPUNDER_SRC;
-        document.body.appendChild(s2);
-      }
-    },1200);
-  });
-})();
+loadMeta();
 </script>
 </body>
 </html>
