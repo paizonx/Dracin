@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Video Player</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+html,body{margin:0;padding:0;background:#000;height:100%}
+#wrap{position:fixed;inset:0}
+iframe,video{width:100%;height:100%;border:0}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <video id="video" controls playsinline style="display:none"></video>
+  <iframe id="dm" allowfullscreen style="display:none"></iframe>
+</div>
+
+<script>
+const q = new URLSearchParams(location.search);
+const dm = q.get("dm");
+const src = q.get("src");
+const DEFAULT_DM_ID = "x8abcd1"; // ganti jika mau
+
+if (dm || DEFAULT_DM_ID) {
+  const id = dm || DEFAULT_DM_ID;
+  const f = document.getElementById("dm");
+  f.src = "https://www.dailymotion.com/embed/video/" + id;
+  f.style.display = "block";
+} else if (src) {
+  const v = document.getElementById("video");
+  v.src = src;
+  v.style.display = "block";
+}
+</script>
+</body>
+</html>
