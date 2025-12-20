@@ -96,7 +96,6 @@ video{display:none;object-fit:contain}
 <body>
   <div class="container">
 
-    <!-- VIDEO FIRST -->
     <div id="shell" class="playerShell">
       <div id="poster" class="poster"></div>
 
@@ -115,7 +114,6 @@ video{display:none;object-fit:contain}
       </div>
     </div>
 
-    <!-- BUTTONS UNDER VIDEO (like your screenshot) -->
     <div class="below">
       <button id="downloadTop" class="btnMain">Download Video</button>
       <div class="hint">Share this link</div>
@@ -251,11 +249,14 @@ video{display:none;object-fit:contain}
 
     if(dmId){
       setTitle('Video');
+      // --- PERBAIKAN: Set Thumbnail langsung dari URL Dailymotion ---
+      setPoster('https://www.dailymotion.com/thumbnail/video/' + dmId);
+      // ------------------------------------------------------------
       try{
         const d=await oembedDailyMotion(dmId);
         if(d){
           setTitle(d.title||'Video');
-          setPoster(d.thumbnail_url||'');
+          if(d.thumbnail_url) setPoster(d.thumbnail_url);
           if(d.width && d.height) setAspect(d.width, d.height);
         }
       }catch(e){}
