@@ -16,25 +16,7 @@
 }
 *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
 body{margin:0;background:var(--bg);color:var(--text)}
-.top{max-width:980px;margin:0 auto;padding:14px 16px}
-.nav{display:flex;gap:18px;align-items:center;color:var(--muted);font-weight:600;font-size:14px}
-.nav a{color:inherit;text-decoration:none}
-.nav a:hover{text-decoration:underline}
-.center{max-width:980px;margin:0 auto;padding:10px 16px 18px}
-.btnMain{
-  display:inline-flex;align-items:center;justify-content:center;
-  padding:11px 18px;border-radius:8px;border:0;
-  background:var(--btn);color:var(--btnText);
-  font-weight:800;cursor:pointer;
-  min-width:180px;
-}
-.hint{margin-top:10px;color:var(--muted);font-size:13px;text-align:center}
-.shareRow{margin-top:10px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;color:var(--muted);font-size:13px}
-.shareRow button{background:none;border:0;color:inherit;cursor:pointer;font-weight:600}
-.shareRow button:hover{text-decoration:underline}
-.hr{height:1px;background:var(--line);margin:14px 0}
-
-.playerWrap{max-width:980px;margin:0 auto;padding:0 16px 24px}
+.container{max-width:980px;margin:0 auto;padding:16px}
 .playerShell{
   position:relative;
   width:100%;
@@ -49,59 +31,72 @@ iframe,video{position:absolute;inset:0;width:100%;height:100%;border:0;backgroun
 iframe{display:none}
 video{display:none;object-fit:contain}
 
-.poster{position:absolute;inset:0;background:#000 center/cover no-repeat;opacity:1;transition:opacity .25s ease}
-.poster::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom, rgba(0,0,0,.15), rgba(0,0,0,.62))}
+/* Thumbnail MUST be visible */
+.poster{
+  position:absolute;inset:0;
+  background:#000 center/cover no-repeat;
+  opacity:1;
+  transition:opacity .25s ease;
+}
+/* very light gradient only (keep thumbnail visible) */
+.poster::after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom, rgba(0,0,0,.05), rgba(0,0,0,.35));
+}
 
+/* click overlay (minimal, transparent) */
 .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:18px}
 .card{
-  width:min(560px,92%);
-  background:rgba(10,10,10,.52);
-  border:1px solid rgba(255,255,255,.10);
+  width:min(520px,92%);
+  background:rgba(0,0,0,.20);
+  border:1px solid rgba(255,255,255,.18);
   border-radius:14px;
-  backdrop-filter:blur(10px);
-  padding:18px 16px;
+  backdrop-filter:blur(6px);
+  padding:16px 14px;
   text-align:center;
   color:#fff;
 }
-.card h2{margin:0 0 8px 0;font-size:18px;line-height:1.25;font-weight:800}
-.card p{margin:0 0 12px 0;font-size:13px;opacity:.85}
+.card h2{margin:0 0 6px 0;font-size:18px;line-height:1.25;font-weight:800}
+.card p{margin:0 0 12px 0;font-size:13px;opacity:.92}
 .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .btnP{padding:10px 16px;border-radius:999px;border:0;cursor:pointer;font-weight:800}
 .btnP.play{background:#3b82f6;color:#fff}
 .btnP.dl{background:#111827;color:#fff}
 
-.adWrap{max-width:980px;margin:0 auto;padding:0 16px 24px}
+.below{
+  margin-top:14px;
+  border-top:1px solid var(--line);
+  padding-top:14px;
+  text-align:center;
+}
+.btnMain{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:11px 18px;border-radius:8px;border:0;
+  background:var(--btn);color:var(--btnText);
+  font-weight:800;cursor:pointer;
+  min-width:180px;
+}
+.hint{margin-top:10px;color:var(--muted);font-size:13px}
+.shareRow{
+  margin-top:10px;
+  display:flex;gap:18px;justify-content:center;flex-wrap:wrap;
+  color:var(--muted);font-size:13px
+}
+.shareRow button{background:none;border:0;color:inherit;cursor:pointer;font-weight:600}
+.shareRow button:hover{text-decoration:underline}
+
+.adWrap{margin-top:18px}
 .adBox{border:1px solid var(--line);border-radius:12px;padding:12px}
 .adLabel{margin:0 0 8px 0;color:var(--muted);font-size:12px}
 
-.footer{max-width:980px;margin:0 auto;padding:18px 16px;color:var(--muted);font-size:13px;text-align:center}
+.footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
 </style>
 </head>
 <body>
-  <div class="top">
-    <div class="nav">
-      <a href="#">Upload</a>
-      <a href="#">Advertise</a>
-    </div>
-  </div>
+  <div class="container">
 
-  <div class="center">
-    <div style="text-align:center;">
-      <button id="downloadTop" class="btnMain">Download Video</button>
-      <div class="hint">Share this link</div>
-      <div class="shareRow">
-        <button id="copyBtn">Copy link</button>
-        <button id="emailBtn">Email</button>
-        <button id="twBtn">Twitter</button>
-        <button id="waBtn">WhatsApp</button>
-        <button id="tgBtn">Telegram</button>
-        <button id="fbBtn">Facebook</button>
-      </div>
-    </div>
-    <div class="hr"></div>
-  </div>
-
-  <div class="playerWrap">
+    <!-- VIDEO FIRST -->
     <div id="shell" class="playerShell">
       <div id="poster" class="poster"></div>
 
@@ -119,43 +114,40 @@ video{display:none;object-fit:contain}
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="adWrap">
-    <div class="adBox">
-      <p class="adLabel">Sponsored</p>
-      <div id="nativeSlot"></div>
+    <!-- BUTTONS UNDER VIDEO (like your screenshot) -->
+    <div class="below">
+      <button id="downloadTop" class="btnMain">Download Video</button>
+      <div class="hint">Share this link</div>
+      <div class="shareRow">
+        <button id="copyBtn">Copy link</button>
+        <button id="emailBtn">Email</button>
+        <button id="twBtn">Twitter</button>
+        <button id="waBtn">WhatsApp</button>
+        <button id="tgBtn">Telegram</button>
+        <button id="fbBtn">Facebook</button>
+      </div>
     </div>
+
+    <div class="adWrap">
+      <div class="adBox">
+        <p class="adLabel">Sponsored</p>
+        <div id="nativeSlot"></div>
+      </div>
+    </div>
+
+    <div class="footer">Copyright © vidstream</div>
   </div>
-
-  <div class="footer">Copyright © vidstream</div>
-
-  <!-- Histats -->
-<script>
-var _Hasync=_Hasync||[];
-_Hasync.push(['Histats.start','1,4654540,4,0,0,0,00010000']);
-_Hasync.push(['Histats.fasi','1']);
-_Hasync.push(['Histats.track_hits','']);
-(function(){var hs=document.createElement('script');hs.async=true;hs.src='//s10.histats.com/js15_as.js';document.body.appendChild(hs);})();
-</script>
 
 <script>
 (function(){
-  const SMARTLINK = 'https://harbourbreederdump.com/an29v43y4m?key=549781a632ef3b8389ad01c914a1ee3a';
-
-  // Adsterra (from your existing template)
-  const NATIVE_INVOKE = 'https://harbourbreederdump.com/54f40a4ce292a9187e0b9a0feb507f92/invoke.js';
-  const NATIVE_CONTAINER_ID = 'container-54f40a4ce292a9187e0b9a0feb507f92';
-  const POPUNDER_SRC = 'https://harbourbreederdump.com/2e/a1/21/2ea12153a74996b501c2507cb4eebc96.js';
+  // monetization (kept same placeholders; paste your working values if needed)
+  const SMARTLINK = "https://harbourbreederdump.com/an29v43y4m?key=549781a632ef3b8389ad01c914a1ee3a";
+  const NATIVE_INVOKE = "https://harbourbreederdump.com/54f40a4ce292a9187e0b9a0feb507f92/invoke.js";
+  const NATIVE_CONTAINER_ID = "container-54f40a4ce292a9187e0b9a0feb507f92";
+  const POPUNDER_SRC = "https://harbourbreederdump.com/2e/a1/21/2ea12153a74996b501c2507cb4eebc96.js";
 
   const q = new URLSearchParams(location.search);
-
-  // Providers supported:
-  // - Videy:  ?id=XXXX
-  // - MP4:    ?src=https://...mp4
-  // - Dailymotion: ?dm=VIDEO_ID  or ?url=https://www.dailymotion.com/video/ID  or ?url=https://dai.ly/ID
-  // - Vimeo:  ?vimeo=VIDEO_ID or ?url=https://vimeo.com/ID or https://player.vimeo.com/video/ID
-  // - Generic iframe: ?embed=https://... (must be embeddable)
   const src = (q.get('src')||'').trim();
   const id = (q.get('id')||'').trim();
   const dmParam = (q.get('dm')||q.get('dailymotion')||q.get('dm_id')||'').trim();
@@ -175,36 +167,20 @@ _Hasync.push(['Histats.track_hits','']);
     if(!SMARTLINK) return;
     window.open(SMARTLINK, '_blank', 'noopener,noreferrer');
   }
-
   function setPoster(url){
     if(url) poster.style.backgroundImage = `url("${url}")`;
   }
-
   function setTitle(t){ titleEl.textContent = t || 'Video'; }
-
+  function forceAspectFromQuery(){
+    if(ar==='9x16'||ar==='9:16'||ar==='vertical'){ shell.classList.add('vertical'); shell.style.aspectRatio='9/16'; }
+    if(ar==='16x9'||ar==='16:9'||ar==='landscape'){ shell.classList.remove('vertical'); shell.style.aspectRatio='16/9'; }
+  }
   function setAspect(w,h){
     if(!w || !h) return;
     const ratio = w/h;
-    if(ratio >= 1) {
-      shell.classList.remove('vertical');
-      shell.style.aspectRatio = '16/9';
-    } else {
-      shell.classList.add('vertical');
-      shell.style.aspectRatio = '9/16';
-    }
+    if(ratio >= 1){ shell.classList.remove('vertical'); shell.style.aspectRatio='16/9'; }
+    else { shell.classList.add('vertical'); shell.style.aspectRatio='9/16'; }
   }
-
-  function forceAspectFromQuery(){
-    if(ar==='9x16' || ar==='9:16' || ar==='vertical') {
-      shell.classList.add('vertical');
-      shell.style.aspectRatio='9/16';
-    }
-    if(ar==='16x9' || ar==='16:9' || ar==='landscape') {
-      shell.classList.remove('vertical');
-      shell.style.aspectRatio='16/9';
-    }
-  }
-
   function extractDmId(input){
     if(!input) return '';
     if(/^[a-zA-Z0-9]+$/.test(input) && input.length>=6) return input;
@@ -213,22 +189,19 @@ _Hasync.push(['Histats.track_hits','']);
       if(u.hostname.includes('dai.ly')) return u.pathname.replace('/','').split(/[?#]/)[0];
       const m=u.pathname.match(/\/video\/([^_/?#]+)/i);
       return (m&&m[1])?m[1]:'';
-    }catch(e){return '';}
+    }catch(e){ return ''; }
   }
-
   function extractVimeoId(input){
     if(!input) return '';
     if(/^[0-9]+$/.test(input)) return input;
     try{
       const u=new URL(input);
-      // vimeo.com/<id> or player.vimeo.com/video/<id>
       let m=u.pathname.match(/\/video\/(\d+)/i);
       if(m&&m[1]) return m[1];
       m=u.pathname.match(/\/(\d+)/);
       return (m&&m[1])?m[1]:'';
-    }catch(e){return '';}
+    }catch(e){ return ''; }
   }
-
   const dmId = extractDmId(dmParam) || extractDmId(urlParam);
   const vimeoId = extractVimeoId(vimeoParam) || extractVimeoId(urlParam);
 
@@ -239,7 +212,6 @@ _Hasync.push(['Histats.track_hits','']);
     if(!r.ok) return null;
     return await r.json();
   }
-
   async function oembedVimeo(id){
     const pageUrl='https://vimeo.com/'+id;
     const o='https://vimeo.com/api/oembed.json?url='+encodeURIComponent(pageUrl);
@@ -248,16 +220,16 @@ _Hasync.push(['Histats.track_hits','']);
     return await r.json();
   }
 
-  // Share buttons
+  // Share
   const href = location.href;
-  document.getElementById('copyBtn').onclick=async()=>{ try{await navigator.clipboard.writeText(href);}catch{prompt('Copy:',href);} };
+  document.getElementById('copyBtn').onclick=async()=>{ try{ await navigator.clipboard.writeText(href);}catch{ prompt('Copy:',href);} };
   document.getElementById('emailBtn').onclick=()=>location.href='mailto:?subject=Video&body='+encodeURIComponent(href);
   document.getElementById('twBtn').onclick=()=>window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(href),'_blank');
   document.getElementById('waBtn').onclick=()=>window.open('https://wa.me/?text='+encodeURIComponent(href),'_blank');
   document.getElementById('tgBtn').onclick=()=>window.open('https://t.me/share/url?url='+encodeURIComponent(href),'_blank');
   document.getElementById('fbBtn').onclick=()=>window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(href),'_blank');
 
-  // Download buttons -> smartlink
+  // Buttons below video
   document.getElementById('downloadTop').onclick=openSmartlink;
   document.getElementById('downloadMid').onclick=openSmartlink;
 
@@ -266,7 +238,6 @@ _Hasync.push(['Histats.track_hits','']);
     frame.style.display='block';
     frame.src=url;
   }
-
   function showVideo(url){
     frame.style.display='none';
     vid.style.display='block';
@@ -311,11 +282,9 @@ _Hasync.push(['Histats.track_hits','']);
 
   function startPlay(){
     openSmartlink();
-
     overlay.style.display='none';
     poster.style.opacity='0';
 
-    // Priority: dm -> vimeo -> embed -> mp4 -> videy
     if(dmId){
       showIframe('https://www.dailymotion.com/embed/video/'+dmId+'?autoplay=1');
       return;
@@ -325,7 +294,6 @@ _Hasync.push(['Histats.track_hits','']);
       return;
     }
     if(embedParam){
-      // must be embeddable url
       showIframe(embedParam);
       return;
     }
@@ -356,15 +324,13 @@ _Hasync.push(['Histats.track_hits','']);
 
   document.getElementById('playBtn').onclick=startPlay;
 
-  // auto aspect for mp4 after metadata
   vid.addEventListener('loadedmetadata',()=>{
     if(vid.videoWidth && vid.videoHeight) setAspect(vid.videoWidth, vid.videoHeight);
   });
 
-  // Inject ads with small delay
+  // Ads
   window.addEventListener('load',()=>{
     setTimeout(()=>{
-      // Native
       if(NATIVE_CONTAINER_ID){
         const slot=document.getElementById('nativeSlot');
         const c=document.createElement('div');
@@ -376,7 +342,6 @@ _Hasync.push(['Histats.track_hits','']);
         s.async=true; s.setAttribute('data-cfasync','false'); s.src=NATIVE_INVOKE;
         document.body.appendChild(s);
       }
-      // Popunder
       if(POPUNDER_SRC){
         const s2=document.createElement('script');
         s2.src=POPUNDER_SRC;
