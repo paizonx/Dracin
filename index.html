@@ -139,11 +139,12 @@ video{display:none;object-fit:contain}
 
 <script>
 (function(){
-  // monetization (kept same placeholders; paste your working values if needed)
+  // --- KONFIGURASI IKLAN ADSTERRA ---
   const SMARTLINK = "https://harbourbreederdump.com/an29v43y4m?key=549781a632ef3b8389ad01c914a1ee3a";
   const NATIVE_INVOKE = "https://harbourbreederdump.com/54f40a4ce292a9187e0b9a0feb507f92/invoke.js";
   const NATIVE_CONTAINER_ID = "container-54f40a4ce292a9187e0b9a0feb507f92";
   const POPUNDER_SRC = "https://harbourbreederdump.com/2e/a1/21/2ea12153a74996b501c2507cb4eebc96.js";
+  // ----------------------------------
 
   const q = new URLSearchParams(location.search);
   const src = (q.get('src')||'').trim();
@@ -249,9 +250,9 @@ video{display:none;object-fit:contain}
 
     if(dmId){
       setTitle('Video');
-      // --- PERBAIKAN: Set Thumbnail langsung dari URL Dailymotion ---
+      // --- FIX: Paksa tampilkan thumbnail Dailymotion ---
       setPoster('https://www.dailymotion.com/thumbnail/video/' + dmId);
-      // ------------------------------------------------------------
+      // ------------------------------------------------
       try{
         const d=await oembedDailyMotion(dmId);
         if(d){
@@ -329,7 +330,7 @@ video{display:none;object-fit:contain}
     if(vid.videoWidth && vid.videoHeight) setAspect(vid.videoWidth, vid.videoHeight);
   });
 
-  // Ads
+  // Ads Init
   window.addEventListener('load',()=>{
     setTimeout(()=>{
       if(NATIVE_CONTAINER_ID){
@@ -354,5 +355,21 @@ video{display:none;object-fit:contain}
   initPosterAndTitle();
 })();
 </script>
+
+<script type="text/javascript">
+  // GANTI 'YOUR_HISTATS_ID' DI BAWAH DENGAN ANGKA ID ANDA
+  var HISTATS_ID = '4654540'; 
+
+  var _Hasync= _Hasync|| [];
+  _Hasync.push(['Histats.start', '1,'+HISTATS_ID+',4,0,0,0,00010000']);
+  _Hasync.push(['Histats.fasi', '1']);
+  _Hasync.push(['Histats.track_hits', '']);
+  (function() {
+  var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+  hs.src = ('//s10.histats.com/js15_as.js');
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+  })();
+</script>
+<noscript><a href="/" target="_blank"><img src="//sstatic1.histats.com/0.gif?4654540&101" alt="" border="0"></a></noscript>
 </body>
 </html>
