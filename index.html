@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Drachin - Stream & Download</title>
+    <title>Dracinz - Stream & Download</title>
     <meta name="theme-color" content="#0f0f0f">
     <meta name="description" content="Watch high quality videos and download for free.">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -23,6 +23,19 @@
         /* CONTAINER */
         .wrapper { max-width: 1000px; margin: 0 auto; min-height: 90vh; }
 
+        /* SEARCH BAR */
+        .search-container { padding: 15px 0; display: flex; gap: 10px; }
+        .search-input { 
+            width: 100%; background: #222; border: 1px solid #333; 
+            padding: 12px 15px; border-radius: 25px; color: #fff; outline: none;
+            font-size: 14px;
+        }
+        .search-input:focus { border-color: var(--red); }
+        .search-btn {
+            background: #222; border: 1px solid #333; color: #fff;
+            padding: 0 20px; border-radius: 25px; cursor: pointer; font-weight: bold;
+        }
+
         /* === PLAYER VIDEO === */
         #playerView { display: none; }
         
@@ -34,7 +47,6 @@
             transition: aspect-ratio 0.3s ease;
         }
 
-        /* Screen Modes */
         .mode-vertical { aspect-ratio: 9/16; max-height: 85vh; width: 100%; } 
         .mode-landscape { aspect-ratio: 16/9; max-width: 100%; }
 
@@ -69,15 +81,10 @@
         
         /* Native Ad Container */
         .native-ad { 
-            background: #111; 
-            border: 1px dashed #333; 
-            border-radius: 8px; 
-            padding: 10px; 
-            margin: 20px 0; 
-            min-height: 250px; 
+            background: #111; border: 1px dashed #333; border-radius: 8px; 
+            padding: 10px; margin: 20px 0; min-height: 250px; 
             display: flex; align-items: center; justify-content: center; 
-            width: 100%; 
-            overflow: hidden;
+            width: 100%; overflow: hidden;
         }
 
         /* DOWNLOAD BUTTON (Direct Link) */
@@ -90,16 +97,23 @@
         }
         .dl-btn:hover { background: #eee; }
 
-        /* === GALLERY (HOME) === */
+        /* === GRID === */
         #homeView { display: block; padding: 15px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; row-gap: 20px; }
         @media(min-width: 600px) { .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; } }
 
-        .card { display: flex; flex-direction: column; cursor: pointer; }
+        .card { display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s; }
+        .card:hover { transform: scale(1.02); }
         .thumb { position: relative; width: 100%; aspect-ratio: 16/9; background: #222; border-radius: 8px; overflow: hidden; }
+        .thumb.poster-mode { aspect-ratio: 2/3; } /* Poster TMDB */
         .thumb img { width: 100%; height: 100%; object-fit: cover; }
+        
         .card-t { font-size: 14px; font-weight: 500; margin-top: 10px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: #f1f1f1; }
         
+        .tag-source { position:absolute; top:5px; left:5px; padding:2px 6px; font-size:10px; font-weight:bold; border-radius:4px; color:white; }
+        .tag-tmdb { background: #e62117; } /* Merah utk Film */
+        .tag-dm { background: #2563eb; } /* Biru utk Video */
+
         /* LOADING */
         #loader { text-align: center; padding: 80px 20px; color: #888; }
         
@@ -108,31 +122,35 @@
         .footer a { color: #888; text-decoration: none; }
     </style>
 
-    <script src="https://harbourbreederdump.com/6d/d4/c7/6dd4c77770d65b1bcda88bbac1019b8a.js"></script>
+    <script src="https://thinnerwithdrewforbear.com/6d/d4/c7/6dd4c77770d65b1bcda88bbac1019b8a.js"></script>
 </head>
 <body>
 
     <nav class="navbar">
-        <a href="?" class="logo"><span>▶</span> Drachin</a>
+        <a href="?" class="logo"><span>▶</span> Dracinz</a>
         <div>
-            <a href="https://harbourbreederdump.com/gcjm4sfz6e?key=f12b44e51f20fb37ba29ae6253bff65a" target="_blank" class="btn-vip">Get App</a>
+            <a href="https://thinnerwithdrewforbear.com/gcjm4sfz6e?key=f12b44e51f20fb37ba29ae6253bff65a" target="_blank" class="btn-vip">Get App</a>
         </div>
     </nav>
 
-    <div id="loader">
-        <h3>Loading Videos...</h3>
-    </div>
+    <div id="loader" style="display:none;"><h3>Searching...</h3></div>
 
     <div class="wrapper">
 
-        <div id="homeView" style="display:none;">
-            <h3 style="margin-bottom:15px; color:#ddd;">Trending Now</h3>
+        <div id="homeView">
+            
+            <div class="search-container">
+                <input type="text" id="searchBox" class="search-input" placeholder="Search Movies or Videos...">
+                <button class="search-btn" onclick="doDualSearch()">GO</button>
+            </div>
+
+            <h3 id="sectionTitle" style="margin-bottom:15px; color:#ddd;">Popular Movies</h3>
             <div class="grid" id="gridTarget"></div>
         </div>
 
         <div id="playerView">
             <div onclick="window.location.href='?'" style="padding:15px; color:#aaa; font-size:14px; border-bottom:1px solid #222; cursor:pointer; display:flex; align-items:center; gap:5px;">
-                <span>&larr;</span> Back to Gallery
+                <span>&larr;</span> Back to Search
             </div>
 
             <div id="playerBox" class="player-box mode-vertical">
@@ -155,7 +173,7 @@
                 <div class="native-ad">
                     <div style="width:100%; text-align:center;">
                         <span style="color:#444; font-size:10px; margin-bottom:5px; display:block;">SPONSORED AD</span>
-                        <script async="async" data-cfasync="false" src="https://harbourbreederdump.com/b94cafeb9a426597e421e6c2d836a415/invoke.js"></script>
+                        <script async="async" data-cfasync="false" src="https://thinnerwithdrewforbear.com/b94cafeb9a426597e421e6c2d836a415/invoke.js"></script>
                         <div id="container-b94cafeb9a426597e421e6c2d836a415"></div>
                     </div>
                 </div>
@@ -163,7 +181,7 @@
                 <div style="display:flex; gap:12px; align-items:center; margin-top:20px;">
                     <div style="width:42px; height:42px; background:#cc0000; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px;">DR</div>
                     <div>
-                        <div style="font-weight:bold;">Drachin Official</div>
+                        <div style="font-weight:bold;">Dracinz Official</div>
                         <div style="font-size:12px; color:#aaa;">New Videos Daily</div>
                     </div>
                 </div>
@@ -176,7 +194,7 @@
     </div>
 
     <div class="footer">
-        &copy; 2025 Drachin Inc. All rights reserved.<br>
+        &copy; 2025 Dracinz Inc. All rights reserved.<br>
         <div style="margin-top:10px;">
             <a href="#">Privacy Policy</a> • <a href="#">Terms of Service</a>
         </div>
@@ -194,129 +212,173 @@
     </div>
 
     <script>
-        const DB_FILE = "videos.txt";
-        // CORRECT SMARTLINK (From AdultXin.txt)
-        const AD_LINK = "https://harbourbreederdump.com/gcjm4sfz6e?key=f12b44e51f20fb37ba29ae6253bff65a";
+        const TMDB_KEY = "b9f961d942ecf6cb23575ffb5231ff13"; // API Key TMDB Anda
+        const AD_LINK = "https://thinnerwithdrewforbear.com/gcjm4sfz6e?key=f12b44e51f20fb37ba29ae6253bff65a";
 
-        const loader = document.getElementById('loader');
         const homeView = document.getElementById('homeView');
         const playerView = document.getElementById('playerView');
         const playerBox = document.getElementById('playerBox');
         const dmFrame = document.getElementById('dmFrame');
         const overlayLayer = document.getElementById('overlayLayer');
         const vidTitle = document.getElementById('vidTitle');
+        const gridTarget = document.getElementById('gridTarget');
+        const searchBox = document.getElementById('searchBox');
 
         const urlParams = new URLSearchParams(window.location.search);
         const currentId = urlParams.get('id');
 
-        // CLICK EVENT: OVERLAY
         function klikIklan() {
-            window.open(AD_LINK, '_blank'); // Open Smartlink
+            window.open(AD_LINK, '_blank'); 
             overlayLayer.style.display = 'none';
             const src = dmFrame.src;
-            if(!src.includes('autoplay=1')) {
-                dmFrame.src = src.replace('autoplay=0', 'autoplay=1');
-            }
+            if(!src.includes('autoplay=1')) dmFrame.src = src.replace('autoplay=0', 'autoplay=1');
         }
 
-        // CLICK EVENT: DOWNLOAD
-        function bukaIklan() {
-            window.open(AD_LINK, '_blank'); // Open Smartlink
-        }
+        function bukaIklan() { window.open(AD_LINK, '_blank'); }
 
-        async function init() {
+        // === SEARCH: TMDB + DAILYMOTION (HYBRID) ===
+        async function doDualSearch() {
+            const query = searchBox.value;
+            if(!query) return;
+
+            document.getElementById('sectionTitle').innerText = "Results for: " + query;
+            gridTarget.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Searching...</div>';
+
+            let combinedResults = "";
+
+            // 1. CARI TMDB (FILM)
             try {
-                const res = await fetch(DB_FILE + '?t=' + Date.now());
-                if (!res.ok) throw new Error("Failed to load videos.txt");
-                const text = await res.text();
-
-                // Format: ID | TITLE | (Optional: h)
-                const videos = text.split('\n').filter(l => l.includes('|')).map(l => {
-                    const p = l.split('|');
-                    return {
-                        id: p[0].trim(),
-                        title: p[1].trim(),
-                        isHorizontal: (p[2] && p[2].trim().toLowerCase() === 'h') 
-                    };
-                });
-
-                loader.style.display = 'none';
-
-                if (currentId) {
-                    renderPlayer(currentId, videos);
-                } else {
-                    renderHome(videos);
+                const resTMDB = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(query)}`);
+                const dataTMDB = await resTMDB.json();
+                if(dataTMDB.results) {
+                    dataTMDB.results.forEach(m => {
+                        if(m.poster_path) {
+                            const thumb = `https://image.tmdb.org/t/p/w500${m.poster_path}`;
+                            combinedResults += createCard(`tmdb:${m.id}`, m.title, thumb, 'poster-mode', 'MOVIE', 'tag-tmdb');
+                        }
+                    });
                 }
+            } catch(e) {}
 
-            } catch (err) {
-                loader.innerHTML = "Error: " + err.message + "<br>Please upload videos.txt";
+            // 2. CARI DAILYMOTION (VIDEO)
+            try {
+                const resDM = await fetch(`https://api.dailymotion.com/videos?search=${encodeURIComponent(query)}&fields=id,title,thumbnail_480_url&limit=12`);
+                const dataDM = await resDM.json();
+                if(dataDM.list) {
+                    dataDM.list.forEach(v => {
+                        combinedResults += createCard(v.id, v.title, v.thumbnail_480_url, '', 'VIDEO', 'tag-dm');
+                    });
+                }
+            } catch(e) {}
+
+            if(combinedResults === "") {
+                gridTarget.innerHTML = '<div style="text-align:center; padding:20px;">No results found.</div>';
+            } else {
+                gridTarget.innerHTML = combinedResults;
             }
         }
 
-        function renderHome(videos) {
-            homeView.style.display = 'block';
-            playerView.style.display = 'none';
+        function createCard(id, title, thumb, mode, tagText, tagClass) {
+            return `
+            <a href="?id=${id}" class="card">
+                <div class="thumb ${mode}">
+                    <img src="${thumb}" loading="lazy">
+                    <div class="tag-source ${tagClass}">${tagText}</div>
+                </div>
+                <div class="card-t">${title}</div>
+            </a>`;
+        }
+
+        searchBox.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") doDualSearch();
+        });
+
+        // === INIT ===
+        async function init() {
+            if (currentId) {
+                renderPlayer(currentId);
+            } else {
+                loadHomeContent();
+            }
+        }
+
+        // === HOME: HANYA TMDB POPULAR (SESUAI REQUEST) ===
+        async function loadHomeContent() {
+            try {
+                const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_KEY}`);
+                const tmdbData = await tmdbRes.json();
+                
+                let html = '';
+                if(tmdbData.results) {
+                    tmdbData.results.forEach(m => {
+                        if(m.poster_path) {
+                            const thumb = `https://image.tmdb.org/t/p/w500${m.poster_path}`;
+                            html += createCard(`tmdb:${m.id}`, m.title, thumb, 'poster-mode', 'MOVIE', 'tag-tmdb');
+                        }
+                    });
+                }
+                gridTarget.innerHTML = html;
+            } catch(e) {
+                gridTarget.innerHTML = "Error loading movies.";
+            }
+        }
+
+        async function renderPlayer(id) {
+            document.getElementById('homeView').style.display = 'none';
+            document.getElementById('playerView').style.display = 'block';
+
+            let title = "Watch Video";
             
-            let html = '';
-            videos.forEach(v => {
-                let thumb = `https://www.dailymotion.com/thumbnail/video/${v.id}`;
-                if(v.id.startsWith('http')) thumb = 'https://via.placeholder.com/640x360/333/fff?text=VIDEO';
-
-                html += `
-                <a href="?id=${v.id}" class="card">
-                    <div class="thumb">
-                        <img src="${thumb}" onerror="this.src='https://via.placeholder.com/640x360/111/fff?text=Drachin'" loading="lazy">
-                        <div style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.8); color:white; font-size:10px; padding:2px 4px; border-radius:3px;">HD</div>
-                    </div>
-                    <div class="card-t">${v.title}</div>
-                </a>`;
-            });
-            document.getElementById('gridTarget').innerHTML = html;
-        }
-
-        function renderPlayer(id, videos) {
-            homeView.style.display = 'none';
-            playerView.style.display = 'block';
-
-            const data = videos.find(v => v.id === id);
-            const title = data ? data.title : "Watch Video";
-            const isHorizontal = data ? data.isHorizontal : false;
-
-            vidTitle.textContent = title;
-            document.title = title;
-
-            // ATUR UKURAN PLAYER
-            if (isHorizontal) {
+            // LOGIKA PEMUTAR
+            if (/^\d+$/.test(id) || id.startsWith('tmdb:')) {
+                // TMDB MOVIE -> LANDSCAPE
+                const tmdbId = id.replace('tmdb:', '');
                 playerBox.className = "player-box mode-landscape";
+                try {
+                    const res = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${TMDB_KEY}`);
+                    const data = await res.json();
+                    if(data.title) title = data.title;
+                } catch(e){}
+                dmFrame.src = `https://vidsrc.xyz/embed/movie/${tmdbId}`;
+                
+            } else if (id.startsWith('http')) {
+                // DIRECT LINK -> VERTICAL
+                playerBox.className = "player-box mode-vertical"; 
+                dmFrame.src = id;
             } else {
-                playerBox.className = "player-box mode-vertical";
-            }
-
-            // RESET
-            dmFrame.src = "";
-            overlayLayer.style.display = 'flex'; 
-
-            if (id.startsWith('http')) {
-                alert("Please use Dailymotion ID.");
-            } else {
+                // DAILYMOTION -> VERTICAL (Asumsi Short/Drama)
+                playerBox.className = "player-box mode-vertical"; 
+                try {
+                    const resDM = await fetch(`https://api.dailymotion.com/video/${id}?fields=title`);
+                    const dataDM = await resDM.json();
+                    if(dataDM.title) title = dataDM.title;
+                } catch(e){}
                 dmFrame.src = `https://www.dailymotion.com/embed/video/${id}?autoplay=0&queue-enable=false&ui-logo=0&sharing-enable=false`;
             }
 
-            const others = videos.filter(v => v.id !== id).slice(0, 5);
-            let sideHtml = '';
-            others.forEach(v => {
-                let thumb = `https://www.dailymotion.com/thumbnail/video/${v.id}`;
-                if(v.id.startsWith('http')) thumb = 'https://via.placeholder.com/640x360/333/fff?text=VIDEO';
-                
-                sideHtml += `
-                <a href="?id=${v.id}" style="display:flex; gap:10px; color:inherit;">
-                    <div style="width:120px; aspect-ratio:16/9; background:#222; border-radius:6px; overflow:hidden; flex-shrink:0;">
-                        <img src="${thumb}" onerror="this.src='https://via.placeholder.com/640x360/111/fff?text=Play'" style="width:100%; height:100%; object-fit:cover;">
-                    </div>
-                    <div style="font-size:13px; font-weight:500; line-height:1.3;">${v.title}</div>
-                </a>`;
-            });
-            document.getElementById('sideList').innerHTML = sideHtml;
+            vidTitle.textContent = title;
+            document.title = title;
+            
+            overlayLayer.style.display = 'flex';
+
+            // REKOMENDASI (TMDB Popular)
+            const sideList = document.getElementById('sideList');
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_KEY}&page=2`);
+                const data = await res.json();
+                let sideHtml = '';
+                data.results.slice(0, 6).forEach(m => {
+                    const thumb = `https://image.tmdb.org/t/p/w200${m.poster_path}`;
+                    sideHtml += `
+                    <a href="?id=tmdb:${m.id}" style="display:flex; gap:10px; color:inherit;">
+                        <div style="width:70px; aspect-ratio:2/3; background:#222; border-radius:4px; overflow:hidden; flex-shrink:0;">
+                            <img src="${thumb}" style="width:100%; height:100%; object-fit:cover;">
+                        </div>
+                        <div style="font-size:13px; font-weight:500; line-height:1.3;">${m.title}</div>
+                    </a>`;
+                });
+                sideList.innerHTML = sideHtml;
+            } catch(e){}
         }
 
         init();
