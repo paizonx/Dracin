@@ -86,14 +86,14 @@ function loadVideo(){
     let id = getId();
 
     // 🔥 GANTI DENGAN CDN LO
-    let videoUrl = "https://yourcdn.com/video/" + id + ".mp4";
+    let videoUrl = "https://cdn2.videy.co/video/" + id + ".mp4";
 
     let video = document.getElementById("video");
     video.src = videoUrl;
 
     // fallback kalau error
     video.onerror = function(){
-        video.src = "https://yourcdn.com/video/default.mp4";
+        video.src = "https://cdn2.videy.co/video/default.mp4";
     }
 }
 
